@@ -4,10 +4,18 @@ import com.kaki.usercenter.model.domain.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
-* @author kaki
-* @description 针对表【user(user)】的数据库操作Service
-* @createDate 2024-05-06 21:17:11
-*/
+ * user service
+ *
+ * @author kaki
+ */
 public interface UserService extends IService<User> {
-
+    /**
+     * user registration
+     *
+     * @param userAccount user account
+     * @param userPassword user password
+     * @param checkPassword check password
+     * @return new user id
+     */
+    long userRegister(String userAccount, String userPassword, String checkPassword);
 }

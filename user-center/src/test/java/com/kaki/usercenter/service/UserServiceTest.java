@@ -22,8 +22,8 @@ public class UserServiceTest {
     @Test
     public void testAddUser() {
         User user = new User();
-        user.setUsername("mockUser");
-        user.setUserAccount("123");
+        user.setUsername("mockUsername");
+        user.setUserAccount("mockUserAccount");
         user.setAvatarUrl("mockAvatarUrl");
         user.setGender(0);
         user.setUserPassword("xxx");
@@ -34,4 +34,43 @@ public class UserServiceTest {
         assertTrue(result);
     }
 
+    @Test
+    void userRegister() {
+        String userAccount = "mockUserAccount2";
+        String userPassword = "";
+        String checkPassword = "12345678";
+        long result = userService.userRegister(userAccount, userPassword, checkPassword);
+        Assertions.assertEquals(-1, result);
+
+        userAccount = "mo";
+        userPassword = "12345678";
+        result = userService.userRegister(userAccount, userPassword, checkPassword);
+        Assertions.assertEquals(-1, result);
+
+        userAccount = "mockUserAccount2";
+        userPassword = "123456";
+        result = userService.userRegister(userAccount, userPassword, checkPassword);
+        Assertions.assertEquals(-1, result);
+
+        userAccount = "mock&";
+        userPassword = "12345678";
+        result = userService.userRegister(userAccount, userPassword, checkPassword);
+        Assertions.assertEquals(-1, result);
+
+        userAccount = "mockUserAccount";
+        result = userService.userRegister(userAccount, userPassword, checkPassword);
+        Assertions.assertEquals(-1, result);
+
+        userAccount = "mockUserAccount2";
+        userPassword = "12345678";
+        checkPassword = "123456789";
+        result = userService.userRegister(userAccount, userPassword, checkPassword);
+        Assertions.assertEquals(-1, result);
+
+        userAccount = "mockUserAccount4";
+        userPassword = "12345678";
+        checkPassword = "12345678";
+        result = userService.userRegister(userAccount, userPassword, checkPassword);
+        Assertions.assertTrue(result > 0);
+    }
 }
