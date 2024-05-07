@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
  * @author kaki
  */
 public interface UserService extends IService<User> {
+
     /**
      * user registration
      *
@@ -27,4 +28,12 @@ public interface UserService extends IService<User> {
      * @return anonymized user information
      */
     User userLogin(String userAccount, String userPassword, HttpServletRequest request);
+
+    /**
+     * anonymize user data
+     *
+     * @param user user
+     * @return safety user
+     */
+    User getSafetyUser(User user);
 }

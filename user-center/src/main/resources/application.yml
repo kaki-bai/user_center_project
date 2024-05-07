@@ -6,6 +6,8 @@ spring:
     url: jdbc:mysql://localhost:3306/user_data
     username: root
     password: 123456
+  session:
+    timeout: PT24H
 
 server:
   port: 8080

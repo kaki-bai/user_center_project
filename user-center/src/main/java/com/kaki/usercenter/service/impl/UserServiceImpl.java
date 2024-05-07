@@ -1,5 +1,4 @@
 package com.kaki.usercenter.service.impl;
-import java.util.Date;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -15,6 +14,8 @@ import org.springframework.util.DigestUtils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.kaki.usercenter.constant.UserConstant.USER_LOGIN_STATE;
 
 /**
  * user service implement class
@@ -33,11 +34,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
      * salt: to obfuscate the password
      */
     private static final String SALT = "kaki";
-
-    /**
-     * user login state
-     */
-    private static final String USER_LOGIN_STATE = "userLoginState";
 
     @Override
     public long userRegister(String userAccount, String userPassword, String checkPassword) {
@@ -124,6 +120,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }
 
         // 3.anonymize user data
+        User safetyUser = getSafetyUser(user);
+
+        // 4.track user login status
+        request.getSession().setAttribute(USER_LOGIN_STATE, safetyUser);
+        return safetyUser;
+    }
+
+    /**
+     * anonymize user data
+     *
+     * @param user user
+     * @return safety user
+     */
+    @Override
+    public User getSafetyUser(User user) {
         User safetyUser = new User();
         safetyUser.setId(user.getId());
         safetyUser.setUsername(user.getUsername());
@@ -132,12 +143,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         safetyUser.setGender(user.getGender());
         safetyUser.setPhone(user.getPhone());
         safetyUser.setEmail(user.getEmail());
+        safetyUser.setUserRole(user.getUserRole());
         safetyUser.setUserStatus(user.getUserStatus());
         safetyUser.setCreateTime(user.getCreateTime());
-
-        // 4.track user login status
-        request.getSession().setAttribute(USER_LOGIN_STATE, safetyUser);
-
         return safetyUser;
     }
 }
