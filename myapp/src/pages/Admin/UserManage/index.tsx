@@ -1,5 +1,5 @@
 import { Footer } from '@/components';
-import { login } from '@/services/ant-design-pro/api';
+import { register } from '@/services/ant-design-pro/api';
 import {
   AlipayCircleOutlined,
   LockOutlined,
@@ -7,13 +7,11 @@ import {
   UserOutlined,
   WeiboCircleOutlined,
 } from '@ant-design/icons';
-import { LoginForm, ProFormCheckbox, ProFormText } from '@ant-design/pro-components';
-import { Helmet, history, useModel } from '@umijs/max';
-import { Alert, Space, Tabs, message } from 'antd';
+import { LoginForm, ProFormText } from '@ant-design/pro-components';
+import { Helmet, history } from '@umijs/max';
+import { Alert, Tabs, message } from 'antd';
 import { createStyles } from 'antd-style';
 import React, { useState } from 'react';
-import { flushSync } from 'react-dom';
-import { Link } from 'react-router-dom';
 import Settings from '../../../../config/defaultSettings';
 const useStyles = createStyles(({ token }) => {
   return {
@@ -78,55 +76,44 @@ const LoginMessage: React.FC<{
     />
   );
 };
-const Login: React.FC = () => {
-  // const [userLoginState, setUserLoginState] = useState<API.LoginResult>({});
-  const [userLoginState] = useState<API.LoginResult>({});
+const Register: React.FC = () => {
+  const [userLoginState, setUserLoginState] = useState<API.RegisterResult>();
   const [type, setType] = useState<string>('account');
-  const { initialState, setInitialState } = useModel('@@initialState');
+  // const { initialState, setInitialState } = useModel('@@initialState');
   const { styles } = useStyles();
-  const fetchUserInfo = async () => {
-    const userInfo = await initialState?.fetchUserInfo?.();
-    if (userInfo) {
-      flushSync(() => {
-        setInitialState((s) => ({
-          ...s,
-          currentUser: userInfo,
-        }));
-      });
+  const handleSubmit = async (values: API.RegisterParams) => {
+    const { userPassword, checkPassword } = values;
+    if (userPassword !== checkPassword) {
+      message.error('Passwords do not match');
+      return;
     }
-  };
-  const handleSubmit = async (values: API.LoginParams) => {
     try {
-      // 登录
-      const user = await login({
-        ...values,
-        type,
-      });
-      if (user) {
-        const defaultLoginSuccessMessage = 'Login successfully！';
+      // 注册
+      const id = await register(values);
+      if (id > 0) {
+        const defaultLoginSuccessMessage = '登录成功！';
         message.success(defaultLoginSuccessMessage);
-        await fetchUserInfo();
         const urlParams = new URL(window.location.href).searchParams;
-        history.push('/');
+        // history.push(urlParams.get('redirect') || '/');
+        history.push('/user/login?redirect=' + urlParams.get('redirect'));
         return;
+      } else {
+        throw new Error(`register error id = ${id}`);
       }
-      console.log(user);
-      // 如果失败去设置用户错误信息
-      // setUserLoginState(user);
     } catch (error) {
-      const defaultLoginFailureMessage = 'Login failed...';
+      const defaultLoginFailureMessage = '登录失败，请重试！';
       console.log(error);
       message.error(defaultLoginFailureMessage);
     }
   };
-  const { status, type: loginType } = userLoginState;
   return (
     <div className={styles.container}>
       <Helmet>
         <title>
-          {'Login'}- {Settings.title}
+          {'登录'}- {Settings.title}
         </title>
       </Helmet>
+      <Lang />
       <div
         style={{
           flex: '1',
@@ -136,7 +123,7 @@ const Login: React.FC = () => {
         <LoginForm
           submitter={{
             searchConfig: {
-              submitText: 'Login',
+              submitText: 'Register',
             },
           }}
           contentStyle={{
@@ -146,11 +133,8 @@ const Login: React.FC = () => {
           logo={<img alt="logo" src="/logo_claws.png" />}
           title="MOCHI"
           subTitle="hello!!!"
-          initialValues={{
-            autoLogin: true,
-          }}
           onFinish={async (values) => {
-            await handleSubmit(values as API.LoginParams);
+            await handleSubmit(values as API.RegisterParams);
           }}
         >
           <Tabs
@@ -160,12 +144,12 @@ const Login: React.FC = () => {
             items={[
               {
                 key: 'account',
-                label: 'Account Login',
+                label: '账户密码登录',
               },
             ]}
           />
 
-          {status === 'error' && loginType === 'account' && <LoginMessage content={'error'} />}
+          {status === 'error' && <LoginMessage content={'error'} />}
           {type === 'account' && (
             <>
               <ProFormText
@@ -174,11 +158,11 @@ const Login: React.FC = () => {
                   size: 'large',
                   prefix: <UserOutlined />,
                 }}
-                placeholder={'Account'}
+                placeholder={'username'}
                 rules={[
                   {
                     required: true,
-                    message: 'Please input your account',
+                    message: '用户名是必填项！',
                   },
                   {
                     min: 4,
@@ -193,11 +177,30 @@ const Login: React.FC = () => {
                   size: 'large',
                   prefix: <LockOutlined />,
                 }}
-                placeholder={'Password'}
+                placeholder={'Password (at least 8 characters)'}
                 rules={[
                   {
                     required: true,
-                    message: 'Please input your password',
+                    message: '密码是必填项！',
+                  },
+                  {
+                    min: 8,
+                    type: 'string',
+                    message: 'Length must be at least 8',
+                  },
+                ]}
+              />
+              <ProFormText.Password
+                name="checkPassword"
+                fieldProps={{
+                  size: 'large',
+                  prefix: <LockOutlined />,
+                }}
+                placeholder={'Password (again)'}
+                rules={[
+                  {
+                    required: true,
+                    message: '密码是必填项！',
                   },
                   {
                     min: 8,
@@ -213,25 +216,11 @@ const Login: React.FC = () => {
             style={{
               marginBottom: 24,
             }}
-          >
-            <Space>
-              <ProFormCheckbox noStyle name="autoLogin">
-                AutoLogin
-              </ProFormCheckbox>
-              <Link to="/user/register">Register</Link>
-              <a
-                style={{
-                  float: 'right',
-                }}
-              >
-                Forgot?
-              </a>
-            </Space>
-          </div>
+          ></div>
         </LoginForm>
       </div>
       <Footer />
     </div>
   );
 };
-export default Login;
+export default Register;

@@ -1,28 +1,19 @@
-import {Footer} from '@/components';
-import {register} from '@/services/ant-design-pro/api';
+import { Footer } from '@/components';
+import { register } from '@/services/ant-design-pro/api';
 import {
   AlipayCircleOutlined,
   LockOutlined,
-  MobileOutlined,
   TaobaoCircleOutlined,
   UserOutlined,
   WeiboCircleOutlined,
 } from '@ant-design/icons';
-import {
-  LoginForm,
-  ProFormCaptcha,
-  ProFormCheckbox,
-  ProFormText,
-} from '@ant-design/pro-components';
-import {FormattedMessage, history, SelectLang, useIntl, useModel, Helmet} from '@umijs/max';
-import {Alert, message, Tabs} from 'antd';
+import { LoginForm, ProFormText } from '@ant-design/pro-components';
+import { Helmet, history } from '@umijs/max';
+import { Alert, Tabs, message } from 'antd';
+import { createStyles } from 'antd-style';
+import React, { useState } from 'react';
 import Settings from '../../../../config/defaultSettings';
-import React, {useState} from 'react';
-import {flushSync} from 'react-dom';
-import {createStyles} from 'antd-style';
-import {SYSTEM_LOGO} from "src/constants";
-
-const useStyles = createStyles(({token}) => {
+const useStyles = createStyles(({ token }) => {
   return {
     action: {
       marginLeft: '8px',
@@ -57,32 +48,23 @@ const useStyles = createStyles(({token}) => {
     },
   };
 });
-
 const ActionIcons = () => {
-  const {styles} = useStyles();
-
+  const { styles } = useStyles();
   return (
     <>
-      <AlipayCircleOutlined key="AlipayCircleOutlined" className={styles.action}/>
-      <TaobaoCircleOutlined key="TaobaoCircleOutlined" className={styles.action}/>
-      <WeiboCircleOutlined key="WeiboCircleOutlined" className={styles.action}/>
+      <AlipayCircleOutlined key="AlipayCircleOutlined" className={styles.action} />
+      <TaobaoCircleOutlined key="TaobaoCircleOutlined" className={styles.action} />
+      <WeiboCircleOutlined key="WeiboCircleOutlined" className={styles.action} />
     </>
   );
 };
-
 const Lang = () => {
-  const {styles} = useStyles();
-
-  return (
-    <div className={styles.lang} data-lang>
-      {SelectLang && <SelectLang/>}
-    </div>
-  );
+  const { styles } = useStyles();
+  return;
 };
-
 const LoginMessage: React.FC<{
   content: string;
-}> = ({content}) => {
+}> = ({ content }) => {
   return (
     <Alert
       style={{
@@ -94,29 +76,22 @@ const LoginMessage: React.FC<{
     />
   );
 };
-
 const Register: React.FC = () => {
   const [userLoginState, setUserLoginState] = useState<API.RegisterResult>();
   const [type, setType] = useState<string>('account');
   // const { initialState, setInitialState } = useModel('@@initialState');
-  const {styles} = useStyles();
-  const intl = useIntl();
-
+  const { styles } = useStyles();
   const handleSubmit = async (values: API.RegisterParams) => {
-    const {userPassword, checkPassword} = values;
+    const { userPassword, checkPassword } = values;
     if (userPassword !== checkPassword) {
-      message.error('Passwords do not match')
-      return
+      message.error('Passwords do not match');
+      return;
     }
-
     try {
-      // 注册　
+      // 注册
       const id = await register(values);
       if (id > 0) {
-        const defaultLoginSuccessMessage = intl.formatMessage({
-          id: 'pages.login.success',
-          defaultMessage: 'Registered successfully！',
-        });
+        const defaultLoginSuccessMessage = 'Register successfully!';
         message.success(defaultLoginSuccessMessage);
         const urlParams = new URL(window.location.href).searchParams;
         // history.push(urlParams.get('redirect') || '/');
@@ -126,27 +101,18 @@ const Register: React.FC = () => {
         throw new Error(`register error id = ${id}`);
       }
     } catch (error) {
-      const defaultLoginFailureMessage = intl.formatMessage({
-        id: 'pages.login.failure',
-        defaultMessage: 'Registration failed...',
-      });
+      const defaultLoginFailureMessage = 'Register failed...';
       console.log(error);
       message.error(defaultLoginFailureMessage);
     }
   };
-
   return (
     <div className={styles.container}>
       <Helmet>
         <title>
-          {intl.formatMessage({
-            id: 'menu.login',
-            defaultMessage: 'Registration page',
-          })}
-          - {Settings.title}
+          {'Register'}- {Settings.title}
         </title>
       </Helmet>
-      <Lang/>
       <div
         style={{
           flex: '1',
@@ -156,14 +122,14 @@ const Register: React.FC = () => {
         <LoginForm
           submitter={{
             searchConfig: {
-              submitText: 'Register'
-            }
+              submitText: 'Register',
+            },
           }}
           contentStyle={{
             minWidth: 280,
             maxWidth: '75vw',
           }}
-          logo={<img alt="logo" src="/logo_claws.png"/>}
+          logo={<img alt="logo" src="/logo_claws.png" />}
           title="MOCHI"
           subTitle="hello!!!"
           onFinish={async (values) => {
@@ -177,37 +143,25 @@ const Register: React.FC = () => {
             items={[
               {
                 key: 'account',
-                label: intl.formatMessage({
-                  id: 'pages.login.accountLogin.tab',
-                  defaultMessage: 'Registration',
-                }),
+                label: 'Register',
               },
             ]}
           />
 
-          {status === 'error' && (
-            <LoginMessage
-              content={'error'}
-            />
-          )}
+          {status === 'error' && <LoginMessage content={'error'} />}
           {type === 'account' && (
             <>
               <ProFormText
                 name="userAccount"
                 fieldProps={{
                   size: 'large',
-                  prefix: <UserOutlined/>,
+                  prefix: <UserOutlined />,
                 }}
                 placeholder={'username'}
                 rules={[
                   {
                     required: true,
-                    message: (
-                      <FormattedMessage
-                        id="pages.login.username.required"
-                        defaultMessage="please enter username"
-                      />
-                    ),
+                    message: 'Please input your account',
                   },
                   {
                     min: 4,
@@ -220,18 +174,13 @@ const Register: React.FC = () => {
                 name="userPassword"
                 fieldProps={{
                   size: 'large',
-                  prefix: <LockOutlined/>,
+                  prefix: <LockOutlined />,
                 }}
                 placeholder={'Password (at least 8 characters)'}
                 rules={[
                   {
                     required: true,
-                    message: (
-                      <FormattedMessage
-                        id="pages.login.password.required"
-                        defaultMessage="Please enter password"
-                      />
-                    ),
+                    message: 'Please input your password',
                   },
                   {
                     min: 8,
@@ -244,18 +193,13 @@ const Register: React.FC = () => {
                 name="checkPassword"
                 fieldProps={{
                   size: 'large',
-                  prefix: <LockOutlined/>,
+                  prefix: <LockOutlined />,
                 }}
                 placeholder={'Password (again)'}
                 rules={[
                   {
                     required: true,
-                    message: (
-                      <FormattedMessage
-                        id="pages.login.password.required"
-                        defaultMessage="Please enter password again"
-                      />
-                    ),
+                    message: 'Please input your password again',
                   },
                   {
                     min: 8,
@@ -271,14 +215,11 @@ const Register: React.FC = () => {
             style={{
               marginBottom: 24,
             }}
-          >
-
-          </div>
+          ></div>
         </LoginForm>
       </div>
-      <Footer/>
+      <Footer />
     </div>
   );
 };
-
 export default Register;
