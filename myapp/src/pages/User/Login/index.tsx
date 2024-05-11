@@ -16,7 +16,8 @@ import {
   ProFormText,
 } from '@ant-design/pro-components';
 import { FormattedMessage, history, SelectLang, useIntl, useModel, Helmet } from '@umijs/max';
-import { Alert, message, Tabs } from 'antd';
+import { Link} from 'react-router-dom';
+import {Alert, Divider, message, Space, Tabs} from 'antd';
 import Settings from '../../../../config/defaultSettings';
 import React, { useState } from 'react';
 import { flushSync } from 'react-dom';
@@ -216,6 +217,11 @@ const Login: React.FC = () => {
                       />
                     ),
                   },
+                  {
+                    min: 4,
+                    type: 'string',
+                    message: 'Length must be at least 4',
+                  },
                 ]}
               />
               <ProFormText.Password
@@ -250,16 +256,20 @@ const Login: React.FC = () => {
               marginBottom: 24,
             }}
           >
-            <ProFormCheckbox noStyle name="autoLogin">
-              <FormattedMessage id="pages.login.rememberMe" defaultMessage="auto login" />
-            </ProFormCheckbox>
-            <a
-              style={{
-                float: 'right',
-              }}
-            >
-              <FormattedMessage id="pages.login.forgotPassword" defaultMessage="forgot password" />
-            </a>
+            <Space>
+              <ProFormCheckbox noStyle name="autoLogin">
+                <FormattedMessage id="pages.login.rememberMe" defaultMessage="auto login" />
+              </ProFormCheckbox>
+              <Link to="/user/register">Register</Link>
+              <a
+                style={{
+                  float: 'right',
+                }}
+              >
+                <FormattedMessage id="pages.login.forgotPassword" defaultMessage="forgot password" />
+              </a>
+            </Space>
+
           </div>
         </LoginForm>
       </div>

@@ -209,6 +209,11 @@ const Register: React.FC = () => {
                       />
                     ),
                   },
+                  {
+                    min: 4,
+                    type: 'string',
+                    message: 'Length must be at least 4',
+                  },
                 ]}
               />
               <ProFormText.Password
