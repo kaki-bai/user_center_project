@@ -1,11 +1,18 @@
 import { PageContainer } from '@ant-design/pro-components';
 import '@umijs/max';
-import React from 'react';
-const Admin: React.FC = () => {
-  // const children = props;
+import React, { ReactNode } from 'react';
+
+interface AdminProps {
+  children?: ReactNode;  // 使用 ReactNode 类型为 children 提供类型定义
+}
+
+const Admin: React.FC<AdminProps> = ({ children }) => {
+
+  alert(children);
   return (
-    <PageContainer content={' 这个页面只有 admin 权限才能查看'}>
-      {/*{children}*/}
+    <PageContainer content="MANAGE">
+
+      {children}
 
       <p
         style={{
