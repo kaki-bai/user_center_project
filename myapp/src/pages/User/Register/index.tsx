@@ -208,6 +208,20 @@ const Register: React.FC = () => {
                   },
                 ]}
               />
+              <ProFormText
+                name="planetCode"
+                fieldProps={{
+                  size: 'large',
+                  prefix: <UserOutlined />,
+                }}
+                placeholder={'planet code'}
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please input your planet code',
+                  },
+                ]}
+              />
             </>
           )}
 

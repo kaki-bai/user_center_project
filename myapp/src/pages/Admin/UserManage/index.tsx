@@ -42,6 +42,11 @@ const columns: ProColumns<API.CurrentUser>[] = [
       ),
    },
   {
+    title: 'planet code',
+    dataIndex: 'planetCode',
+    copyable: true,
+  },
+  {
     title: 'gender',
     dataIndex: 'gender',
   },

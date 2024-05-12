@@ -36,11 +36,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     private static final String SALT = "kaki";
 
     @Override
-    public long userRegister(String userAccount, String userPassword, String checkPassword) {
+    public long userRegister(String userAccount, String userPassword, String checkPassword, String planetCode) {
         // todo change to custom exception
         // 1. validation
         // not empty
-        if (StringUtils.isAnyBlank(userAccount,userPassword,checkPassword)){
+        if (StringUtils.isAnyBlank(userAccount,userPassword,checkPassword, planetCode)){
             return -1;
         }
         // account length >= 4
@@ -49,6 +49,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }
         // password >= 8
         if (userPassword.length() < 8 || checkPassword.length() < 8){
+            return -1;
+        }
+        // planet code
+        if (planetCode.length() > 5){
             return -1;
         }
         // no special characters
@@ -64,6 +68,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         if (count > 0) {
             return -1;
         }
+        // no repeat planet code
+        queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("planetCode", planetCode);
+        count = this.count(queryWrapper);
+        if (count > 0) {
+            return -1;
+        }
         // check password
         if (!userPassword.equals(checkPassword)){
             return -1;
@@ -76,6 +87,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         User user = new User();
         user.setUserAccount(userAccount);
         user.setUserPassword(encryptPassword);
+        user.setPlanetCode(planetCode);
         boolean saveResult = this.save(user);
         if (!saveResult){
             return -1;
@@ -149,6 +161,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         safetyUser.setUserRole(user.getUserRole());
         safetyUser.setUserStatus(user.getUserStatus());
         safetyUser.setCreateTime(user.getCreateTime());
+        safetyUser.setPlanetCode(user.getPlanetCode());
         return safetyUser;
     }
 
