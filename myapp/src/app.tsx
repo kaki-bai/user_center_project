@@ -3,9 +3,10 @@ import { currentUser as queryCurrentUser } from '@/services/ant-design-pro/api';
 import { LinkOutlined } from '@ant-design/icons';
 import type { Settings as LayoutSettings } from '@ant-design/pro-components';
 import { SettingDrawer } from '@ant-design/pro-components';
-import { Link, RunTimeLayoutConfig, history } from '@umijs/max';
+import {Link, RunTimeLayoutConfig, history} from '@umijs/max';
 import defaultSettings from '../config/defaultSettings';
 import { errorConfig } from './requestErrorConfig';
+
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
 /**
@@ -26,12 +27,12 @@ export async function getInitialState(): Promise<{
     try {
       return await queryCurrentUser();
     } catch (error) {
+      console.log(`a${error}`);
       history.push(loginPath);
     }
     return undefined;
   };
   // 如果是无需登录页面，不执行
-  const { location } = history;
   if (NO_NEED_LOGIN_WHITE_LIST.includes(history.location.pathname)) {
     return {
       // @ts-ignore

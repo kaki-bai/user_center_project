@@ -106,7 +106,7 @@ const Login: React.FC = () => {
         const defaultLoginSuccessMessage = 'Login successfully！';
         message.success(defaultLoginSuccessMessage);
         await fetchUserInfo();
-        const urlParams = new URL(window.location.href).searchParams;
+        if (!history) return;
         history.push('/');
         return;
       }

@@ -79,7 +79,6 @@ const LoginMessage: React.FC<{
 const Register: React.FC = () => {
   const [userLoginState, setUserLoginState] = useState<API.RegisterResult>();
   const [type, setType] = useState<string>('account');
-  // const { initialState, setInitialState } = useModel('@@initialState');
   const { styles } = useStyles();
   const handleSubmit = async (values: API.RegisterParams) => {
     const { userPassword, checkPassword } = values;
@@ -90,17 +89,15 @@ const Register: React.FC = () => {
     try {
       // 注册
       const id = await register(values);
-      if (id > 0) {
+      if (id) {
         const defaultLoginSuccessMessage = 'Register successfully!';
         message.success(defaultLoginSuccessMessage);
         const urlParams = new URL(window.location.href).searchParams;
         // history.push(urlParams.get('redirect') || '/');
         history.push('/user/login?redirect=' + urlParams.get('redirect'));
         return;
-      } else {
-        throw new Error(`register error id = ${id}`);
       }
-    } catch (error) {
+    } catch (error: any) {
       const defaultLoginFailureMessage = 'Register failed...';
       console.log(error);
       message.error(defaultLoginFailureMessage);

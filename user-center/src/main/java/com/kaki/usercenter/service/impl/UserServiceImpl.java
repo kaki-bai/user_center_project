@@ -2,6 +2,8 @@ package com.kaki.usercenter.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.kaki.usercenter.common.ErrorCode;
+import com.kaki.usercenter.exception.BusinessException;
 import com.kaki.usercenter.model.domain.User;
 import com.kaki.usercenter.service.UserService;
 import com.kaki.usercenter.mapper.UserMapper;
@@ -41,43 +43,43 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         // 1. validation
         // not empty
         if (StringUtils.isAnyBlank(userAccount,userPassword,checkPassword, planetCode)){
-            return -1;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "Empty parameter");
         }
         // account length >= 4
         if (userAccount.length() < 4){
-            return -1;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "Account length less than 4");
         }
         // password >= 8
         if (userPassword.length() < 8 || checkPassword.length() < 8){
-            return -1;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "Password length less than 8");
         }
         // planet code
         if (planetCode.length() > 5){
-            return -1;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "Planet code length longer than 5");
         }
         // no special characters
         String validPattern = "\\pP|\\pS|\\s+";
         Matcher matcher = Pattern.compile(validPattern).matcher(userAccount);
         if (matcher.find()){
-            return -1;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "User account contains invalid characters");
         }
         // no repeat account
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("userAccount", userAccount);
         long count = this.count(queryWrapper);
         if (count > 0) {
-            return -1;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "User account already exists");
         }
         // no repeat planet code
         queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("planetCode", planetCode);
         count = this.count(queryWrapper);
         if (count > 0) {
-            return -1;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "Planet code already registered");
         }
         // check password
         if (!userPassword.equals(checkPassword)){
-            return -1;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "Password does not match");
         }
 
         // 2.encrypt password
@@ -101,15 +103,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         // 1. validation
         // not empty
         if (StringUtils.isAnyBlank(userAccount,userPassword)){
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "Empty parameter");
         }
         // account length >= 4
         if (userAccount.length() < 4){
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "Account length less than 4");
         }
         // password >= 8
         if (userPassword.length() < 8){
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "Password length less than 8");
         }
         // no special characters
         String validPattern = "\\pP|\\pS|\\s+";
@@ -127,8 +129,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         User user = userMapper.selectOne(queryWrapper);
         // user doesn't exist
         if (user == null){
-            log.info("user login failed, userAccount cannot match userPassword");
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "User account does not exist");
         }
 
         // 3.anonymize user data
@@ -148,7 +149,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     @Override
     public User getSafetyUser(User user) {
         if (user == null){
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "User account does not exist");
         }
         User safetyUser = new User();
         safetyUser.setId(user.getId());

@@ -3,7 +3,7 @@
 
 declare namespace API {
   type CurrentUser = {
-    id: string;
+    id: number;
     username?: string;
     userAccount: string;
     avatarUrl?: string;
@@ -43,6 +43,16 @@ declare namespace API {
     createdAt?: string;
     progress?: number;
   };
+
+  /**
+   * common response
+   */
+  type BaseResponse<T> = {
+    code: number,
+    data: T,
+    message: string,
+    description: string,
+  }
 
   type RuleList = {
     data?: RuleListItem[];
